@@ -1,0 +1,89 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      httpserver:
+        websocket:
+          max-frame-payload-length: 65536
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin, RETAIN_FIRST
+        - DedupeResponseHeader=Access-Control-Allow-Credentials, RETAIN_FIRST
+      globalcors:
+        add-to-simple-url-handler-mapping: true # Important for OPTIONS handling
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+      routes:
+        - id: document-service
+          uri: http://document-service:8081
+          predicates:
+            - Path=/documents/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+        - id: document-ws
+          uri: http://document-service:8081
+          predicates:
+            - Path=/ws-docs/**
+          filters:
+            - RewritePath=/ws-docs/(?<segment>.*), /ws-docs/${segment}
+        - id: projet-service
+          uri: http://projet-service:8082
+          predicates:
+            - Path=/projet/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+        - id: ressource-service
+          uri: http://ressource-service:8083
+          predicates:
+            - Path=/classe/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+        - id: chat-service
+          uri: http://chat-service:8084
+          predicates:
+            - Path=/chat/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin, RETAIN_FIRST
+            - DedupeResponseHeader=Access-Control-Allow-Credentials, RETAIN_FIRST
+        - id: chat-ws
+          uri: http://chat-service:8084
+          predicates:
+            - Path=/ws-chat/**
+          filters:
+            - RewritePath=/ws-chat/(?<segment>.*), /ws-chat/${segment}
+        - id: test-route
+          uri: forward:/test
+          predicates:
+            - Path=/
+
+server:
+  port: ${PORT:8080}
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG
+    reactor.netty.http.server: DEBUG

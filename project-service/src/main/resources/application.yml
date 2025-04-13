@@ -1,0 +1,15 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: projet-service
+  data:
+    mongodb:
+      uri: mongodb://pi-mongodb:27017/projet-db
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

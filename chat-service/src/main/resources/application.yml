@@ -1,0 +1,22 @@
+server:
+  port: 8084
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: chat-service
+  data:
+    mongodb:
+      uri: mongodb://pi-mongodb:27017/chat-db 
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+
+logging:
+  level:
+    org.springframework.web.socket: DEBUG
+    org.springframework.web.servlet.handler.SimpleUrlHandlerMapping: DEBUG
