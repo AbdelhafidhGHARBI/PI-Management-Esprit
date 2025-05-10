@@ -13,6 +13,7 @@
         <option value="$PROJECT_DIR$/document-service/pom.xml" />
         <option value="$PROJECT_DIR$/tache-service/pom.xml" />
         <option value="$PROJECT_DIR$/modele-commun-service/pom.xml" />
+        <option value="$PROJECT_DIR$/user-service/pom.xml" />
       </list>
     </option>
   </component>

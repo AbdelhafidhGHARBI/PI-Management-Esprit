@@ -7,5 +7,6 @@
     <file url="file://$PROJECT_DIR$/modele-commun-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/project-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tache-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/user-service/src/main/java" charset="UTF-8" />
   </component>
 </project>

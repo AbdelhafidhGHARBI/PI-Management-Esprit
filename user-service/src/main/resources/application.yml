@@ -1,0 +1,67 @@
+server:
+  port: 8081
+  forward-headers-strategy: framework
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://pi-mongodb:27017/user_db
+      auto-index-creation: true
+  security:
+    filter:
+      order: 0
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "pi.esprit.management@gmail.com"
+    password: "euqj phkh mmjb udcz"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+jwt:
+  secret-key: "dGhpc2lzYXNlY3JldGtleWZvcmRldmVsb3BtZW50b25seTEyMw==" # Base64-encoded 32+ character secret
+  access-expiration: 1800000 # 30 minutes in milliseconds
+
+logging:
+  level:
+    root: INFO  # general log level for all packages
+    org.springframework: INFO  # helpful for debugging Spring
+    tn.esprit: INFO  # your app packages
+    org.apache.tomcat.util.net.NioEndpoint: WARN  # suppress Tomcat Poller spam
+    org.mongodb.driver.cluster: WARN  # suppress MongoDB ping logs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+
+springdoc:
+  swagger-ui:
+    use-relative-base-url: true
+    # Use the gateway path for Swagger config
+    config-url: /api/users/v3/api-docs/swagger-config
+    # Use the gateway path for API docs
+    url: /api/users/v3/api-docs
+  api-docs:
+    # Keep the default path for the user-service
+    path: /v3/api-docs
+
