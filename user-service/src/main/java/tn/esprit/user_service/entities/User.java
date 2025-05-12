@@ -3,11 +3,13 @@ package tn.esprit.user_service.entities;
 import lombok.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import tn.esprit.user_service.entities.enums.AccountStatus;
 import tn.esprit.user_service.entities.enums.Role;
+import tn.esprit.user_service.entities.enums.Sex;
 import tn.esprit.user_service.entities.enums.ThemePreference;
 
 import java.time.LocalDateTime;
@@ -36,15 +38,19 @@ public class User extends BaseEntity  implements UserDetails {
 //    @Setter(AccessLevel.NONE) // Prevent direct modification
     private String passwordHash;
     private String bio;
+    @Field("phoneNumber")
     private String phoneNumber;
     private ThemePreference theme = ThemePreference.LIGHT;
     private String profilePictureUrl;
     private Role role = Role.STUDENT;
+    private Sex sex ;
     private AccountStatus accountStatus = AccountStatus.PENDING;
     private int failedLoginAttempts = 0;
     private LocalDateTime lockUntil;
     private LocalDateTime lastLoginAt; // NEW
 
+    @Indexed
+    private String classId;
 
     // NEW: Device tracking
     private List<DeviceInfo> trustedDevices = new ArrayList<>();
@@ -85,6 +91,6 @@ public class User extends BaseEntity  implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return accountStatus == AccountStatus.ACTIVE;
+        return accountStatus == AccountStatus.ACTIVE || accountStatus == AccountStatus.PASSWORD_RESET_REQUIRED ;
     }
 }

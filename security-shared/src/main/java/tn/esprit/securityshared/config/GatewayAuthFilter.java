@@ -26,12 +26,15 @@ public class GatewayAuthFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         logger.info("🔐 GatewayAuthFilter intercepting path: {}", path);
 
-        if (path.startsWith("/api/users/auth/login") || path.startsWith("/auth/login")) {
-            logger.info("🟢 Public path, skipping auth filter.");
+        boolean isLoginPath = path.startsWith("/api/users/auth/login")
+                || path.startsWith("/api/users/profile_images");
+        logger.info("Is login path? {}", isLoginPath);
+
+        if (isLoginPath) { // Only skip auth for login
+            logger.info("Skipping auth" );
             filterChain.doFilter(request, response);
             return;
         }
-
         String userId = request.getHeader("X-User-Id");
         String email = request.getHeader("X-User-Email");
         String role = request.getHeader("X-User-Role");

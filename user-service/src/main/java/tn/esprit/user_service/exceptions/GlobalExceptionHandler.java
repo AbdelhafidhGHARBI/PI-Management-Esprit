@@ -71,6 +71,15 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNAUTHORIZED
         );
     }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
+        log.error("Unhandled RuntimeException: ", ex);
+        return buildResponse(
+                "Internal Server Error",
+                ex.getMessage() != null ? ex.getMessage() : "Unexpected runtime error",
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {

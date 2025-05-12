@@ -1,11 +1,67 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <title>Account Created</title>
+    <meta charset="UTF-8">
+    <title>Bienvenue chez Esprit-Pi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f8fb;
+            padding: 40px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        p {
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .highlight {
+            color: #2980b9;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-<h1>Welcome, [[${name}]]!</h1>
-<p>Your temporary password is: <strong>[[${password}]]</strong></p>
-<p>Please log in and change it as soon as possible.</p>
+<div class="container">
+    <h1>Bienvenue parmi nous, <span class="highlight">[[${prenom}]] [[${nom}]]</span> !</h1>
+
+    <p>
+        Nous sommes ravis de vous accueillir chez <strong>Esprit-Pi</strong>. Votre compte a été créé avec succès.
+    </p>
+
+    <p>
+        Voici vos informations de connexion :
+        <br><br>
+        ✉️ <strong>Email :</strong> <span class="highlight">[[${email}]]</span><br>
+        🔑 <strong>Mot de passe temporaire :</strong> <span class="highlight">[[${password}]]</span>
+    </p>
+
+    <p>
+        Veuillez vous connecter dès que possible et changer votre mot de passe pour sécuriser votre compte.
+    </p>
+
+    <div class="footer">
+        Merci de faire partie de la famille <strong>Esprit-Pi</strong>.<br>
+        L'équipe <strong>Esprit-Pi</strong>
+    </div>
+</div>
 </body>
 </html>

@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 
-public interface tacheRepository extends MongoRepository<Tache, String> {
+public interface TacheRepository extends MongoRepository<Tache, String> {
     List<Tache> findByProjetId(String projetId); // Pour F05
     List<Tache> findByAssigneeId(String assigneeId); // Pour F07
     List<Tache> findByEquipeId(String equipeId); // Pour F06

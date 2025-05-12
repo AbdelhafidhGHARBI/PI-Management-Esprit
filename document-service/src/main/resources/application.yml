@@ -6,7 +6,7 @@ spring:
     name: document-service
   data:
     mongodb:
-      uri: mongodb://pi-mongodb:27017/documents-db  # Use container name instead of localhost
+      uri: mongodb://localhost:27017/documents-db  # Use container name instead of localhost
 
 management:
   endpoints:

@@ -1,19 +1,24 @@
 package tn.esprit.document_service.controllers;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import tn.esprit.document_service.entities.DocumentEntity;
+import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.document_service.services.DocumentService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 @RestController
-@RequestMapping("/documents")
+@RequestMapping("/api/documents")
+@CrossOrigin("http://localhost:4200")
 public class DocumentController {
     private final DocumentService documentService;
 
@@ -21,41 +26,48 @@ public class DocumentController {
         this.documentService = documentService;
     }
 
-    @GetMapping
-    public List<DocumentEntity> getAllDocuments() {
-        return documentService.getAllDocuments();
-    }
+    @PostMapping("/upload")
+    public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            String filename = documentService.uploadFile(file);
 
-    @GetMapping("/{id}")
-    public DocumentEntity getDocumentById(@PathVariable String id) {
-        return documentService.getDocumentById(id);
-    }
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "File uploaded successfully");
+            response.put("filename", filename);
 
-    @PostMapping
-    public DocumentEntity createDocument(@RequestBody Map<String, Object> request) {
-        DocumentEntity document = new DocumentEntity();
-        document.setTitle((String) request.get("title"));
-
-        // Initialize with empty delta if not provided
-        if (request.containsKey("delta")) {
-            document.setContent((Map<String, Object>) request.get("delta"));
-        } else {
-            Map<String, Object> emptyDelta = new HashMap<>();
-            emptyDelta.put("ops", new ArrayList<>());
-            document.setContent(emptyDelta);
+            return ResponseEntity.ok(response);
+        } catch (IOException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error uploading file");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
-
-        return documentService.createDocument(document);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateDocument(@PathVariable String id, @RequestBody Map<String, Object> body) {
-        return ResponseEntity.ok(documentService.updateDocument(id, body));
+
+    @GetMapping("/list")
+    public ResponseEntity<List<String>> listFiles() {
+        return ResponseEntity.ok(documentService.listFiles());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDocument(@PathVariable String id) {
-        documentService.deleteDocument(id);
-        return ResponseEntity.ok().build();
+    @GetMapping("/download/{filename}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
+        try {
+            Resource resource = documentService.downloadFile(filename);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/delete/{filename}")
+    public ResponseEntity<String> deleteFile(@PathVariable String filename) {
+        try {
+            documentService.deleteFile(filename);
+            return ResponseEntity.ok("File deleted successfully");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting file");
+        }
     }
 }

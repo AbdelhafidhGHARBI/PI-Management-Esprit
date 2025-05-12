@@ -1,12 +1,12 @@
 server:
-  port: 9000
+  port: 8083
 
 spring:
   application:
     name: projet-service
   data:
     mongodb:
-      uri: mongodb://localhost:27017/projet-test
+      uri: mongodb://pi-mongodb:27017/projet-db
     devtools:
       restart:
         enabled: true

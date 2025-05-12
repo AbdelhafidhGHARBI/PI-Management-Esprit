@@ -1,56 +1,41 @@
 package tn.esprit.projetservice.services;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tn.esprit.projetservice.dto.ProjectRequest;
-import tn.esprit.projetservice.dto.ProjectResponse;
-import tn.esprit.projetservice.entities.Project;
-import tn.esprit.projetservice.exception.ResourceNotFoundException;
-
-import tn.esprit.projetservice.mapper.ProjectMapper;
-import tn.esprit.projetservice.repositories.ProjectRepository;
+import tn.esprit.projetservice.entities.Projet;
+import tn.esprit.projetservice.repositories.projetRepository;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-public class ProjetServiceImpl implements ProjectService {
+public class ProjetServiceImpl implements IProjetService {
 
-    private final ProjectRepository projectRepository;
-
-    private final ProjectMapper projectMapper;
+    @Autowired
+    private projetRepository projetRepository;
 
     @Override
-    public ProjectResponse createProject(ProjectRequest request) {
-        Project project = projectMapper.toEntity(request);
-        return projectMapper.toDto(projectRepository.save(project));
+    public Projet createProject(Projet project) {
+        return projetRepository.save(project);
     }
 
     @Override
-    public ProjectResponse updateProject(String id, ProjectRequest request) {
-        Project existing = projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id));
-        Project updated = projectMapper.toEntity(request);
-        updated.setId(existing.getId());
-        return projectMapper.toDto(projectRepository.save(updated));
+    public List<Projet> getAllProjects() {
+        return projetRepository.findAll();
     }
 
     @Override
-    public ProjectResponse getProjectById(String id) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id));
-        return projectMapper.toDto(project);
+    public Optional<Projet> getProjectById(String id) {
+        return projetRepository.findById(id);
     }
 
     @Override
-    public List<ProjectResponse> getAllProjects() {
-        return projectRepository.findAll().stream().map(projectMapper::toDto).toList();
+    public Projet updateProject(String id, Projet updatedProject) {
+        updatedProject.setId(id); // S'assurer que l'ID est conservé
+        return projetRepository.save(updatedProject);
     }
 
     @Override
     public void deleteProject(String id) {
-        if (!projectRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Project not found with id: " + id);
-        }
-        projectRepository.deleteById(id);
+        projetRepository.deleteById(id);
     }
 }

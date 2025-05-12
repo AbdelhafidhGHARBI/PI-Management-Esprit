@@ -2,44 +2,39 @@ package tn.esprit.ressourcesservice.Confg;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import tn.esprit.securityshared.config.GatewayAuthFilter;
 
-import java.util.List;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public GatewayAuthFilter gatewayAuthFilter() {
+        return new GatewayAuthFilter();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, GatewayAuthFilter gatewayAuthFilter) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // disable CSRF
-                .cors(cors -> {})             // enable CORS
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // allow preflight requests
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // optional: allow swagger
-                        .anyRequest().authenticated() // secure all other endpoints
-                );
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(gatewayAuthFilter, AuthorizationFilter.class)
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+                .anonymous(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
 }

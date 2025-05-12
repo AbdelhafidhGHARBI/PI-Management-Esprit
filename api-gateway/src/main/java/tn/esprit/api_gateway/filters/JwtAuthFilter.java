@@ -27,7 +27,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         String path = request.getPath().toString();
         System.out.println(path);
         // Skip JWT check for login endpoint
-        if (path.startsWith("/api/users/auth/login")) {
+        if (path.startsWith("/api/users/auth/login" )|| path.startsWith("/api/users/profile_images")) {
             return chain.filter(exchange);
         }
 

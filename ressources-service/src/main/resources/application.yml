@@ -6,7 +6,7 @@ spring:
     name: ressource-service
   data:
     mongodb:
-      uri: mongodb://localhost:27017/ressources-db
+      uri: mongodb://pi-mongodb/ressources-db
 
 management:
   endpoints:

@@ -26,7 +26,7 @@ spring:
             maxAge: 3600
       routes:
         - id: user-service
-          uri: http://user-service:8081
+          uri: http://localhost:8081
           predicates:
             - Path=/api/users/**
           filters:
@@ -34,13 +34,13 @@ spring:
             - RemoveRequestHeader=X-Forwarded-Prefix # Critical fix
             - RemoveRequestHeader=Forwarded
         - id: document-service
-          uri: http://document-service:8082
+          uri: http://localhost:8082
           predicates:
             - Path=/documents/**
           filters:
             - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
         - id: document-ws
-          uri: http://document-service:8082
+          uri: http://localhost:8082
           predicates:
             - Path=/ws-docs/**
           filters:
@@ -63,8 +63,8 @@ spring:
             - Path=/ressources/**
           filters:
             - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
-        - id: taches-service
-          uri: http://taches-service:8088
+        - id: tache-service
+          uri: http://tache-service:8088  # Use the exact container name
           predicates:
             - Path=/taches/**
           filters:
@@ -82,6 +82,12 @@ spring:
             - Path=/ws-chat/**
           filters:
             - RewritePath=/ws-chat/(?<segment>.*), /ws-chat/${segment}
+        - id: team-service
+          uri: http://team-service:8099
+          predicates:
+            - Path=/teams/**
+          filters:
+            - RewritePath=/teams/(?<segment>.*), /teams/${segment}
         - id: test-route
           uri: forward:/test
           predicates:

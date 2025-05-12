@@ -28,7 +28,7 @@ public class RequestLoggingFilter implements Filter {
         long duration = System.currentTimeMillis() - startTime;
 
         logger.info(
-                "{} {} => {} ({} ms)",
+                "Hello to user-modules : {} {} => {} ({} ms)",
                 req.getMethod(),
                 req.getRequestURI(),
                 res.getStatus(),

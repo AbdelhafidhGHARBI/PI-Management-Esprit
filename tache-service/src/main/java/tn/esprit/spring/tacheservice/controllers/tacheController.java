@@ -1,163 +1,132 @@
 package tn.esprit.spring.tacheservice.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.spring.tacheservice.dto.TacheDTO;
+import tn.esprit.spring.tacheservice.entities.Commentaire;
+import tn.esprit.spring.tacheservice.entities.Priorite;
+import tn.esprit.spring.tacheservice.entities.Status;
 import tn.esprit.spring.tacheservice.entities.Tache;
+import tn.esprit.spring.tacheservice.mapper.TacheMapper;
+import tn.esprit.spring.tacheservice.services.ITacheService;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/taches")
-public class tacheController {
-    @Autowired
-    private tacheService tacheService;
+@RequiredArgsConstructor
+public class TacheController {
 
-    // F01: Créer une tâche
+    private final ITacheService tacheService;
+    private final TacheMapper tacheMapper;
+
     @PostMapping
-    public ResponseEntity<Tache> createTache(@RequestBody Tache tache) {
-        return ResponseEntity.ok(tacheService.createTache(tache));
+    public ResponseEntity<TacheDTO> createTache(@RequestBody TacheDTO tacheDTO) {
+        TacheDTO createdTache = tacheService.createTache(tacheDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTache);
     }
 
-    // F02: Lire les détails d'une tâche
     @GetMapping("/{id}")
-    public ResponseEntity<Tache> getTacheById(@PathVariable String id) {
-        Tache tache = tacheService.getTacheById(id);
-        return ResponseEntity.ok(tache);
+    public ResponseEntity<TacheDTO> getTacheById(@PathVariable String id) {
+        return ResponseEntity.ok(tacheService.getTacheById(id));
     }
 
-    // F03: Mettre à jour une tâche
     @PutMapping("/{id}")
-    public ResponseEntity<Tache> updateTache(@PathVariable String id, @RequestBody Tache tache) {
-        try {
-            Tache tacheMiseAJour = tacheService.updateTache(id, tache);
-            return ResponseEntity.ok(tacheMiseAJour);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<TacheDTO> updateTache(@PathVariable String id, @RequestBody TacheDTO tacheDTO) {
+        return ResponseEntity.ok(tacheService.updateTache(id, tacheDTO));
     }
 
-    // F04: Supprimer une tâche
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTache(@PathVariable String id) {
         tacheService.deleteTache(id);
         return ResponseEntity.noContent().build();
     }
 
-//    // F05: Lister les tâches d'un projet
-//    @GetMapping("/projet/{projetId}")
-//    public ResponseEntity<List<Tache>> getTachesByProjet(@PathVariable String projetId) {
-//        return ResponseEntity.ok(tacheService.getTachesByProjet(projetId));
-//    }
-//
-//    // F06: Associer une tâche à une équipe
-//    @PutMapping("/{id}/equipe/{equipeId}")
-//    public ResponseEntity<Tache> associerEquipe(@PathVariable String id, @PathVariable String equipeId) {
-//        try {
-//            Tache tache = tacheService.associerEquipe(id, equipeId);
-//            return ResponseEntity.ok(tache);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    // F07: Attribuer une tâche à un membre
-//    @PutMapping("/{id}/assignee/{membreId}")
-//    public ResponseEntity<Tache> assignerTache(@PathVariable String id, @PathVariable String membreId) {
-//        try {
-//            Tache tache = tacheService.assignerTache(id, membreId);
-//            return ResponseEntity.ok(tache);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    // F08: Définir un statut de tâche
-//    @PutMapping("/{id}/status")
-//    public ResponseEntity<Tache> updateStatus(@PathVariable String id, @RequestBody Status status) {
-//        try {
-//            Tache tache = tacheService.updateStatus(id, status);
-//            return ResponseEntity.ok(tache);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    // F09: Définir des niveaux de priorité
-//    @PutMapping("/{id}/priorite")
-//    public ResponseEntity<Tache> updatePriorite(@PathVariable String id, @RequestBody Priorite priorite) {
-//        try {
-//            Tache tache = tacheService.updatePriorite(id, priorite);
-//            return ResponseEntity.ok(tache);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    // F10: Gérer les échéances et rappels
-//    @GetMapping("/echeance/{jours}")
-//    public ResponseEntity<List<Tache>> getTachesProchesEcheance(@PathVariable int jours) {
-//        return ResponseEntity.ok(tacheService.getTachesProchesEcheance(jours));
-//    }
-//
-//    // F11: Suivi du temps passé
-//    @PutMapping("/{id}/temps")
-//    public ResponseEntity<Tache> ajouterTempsPassé(@PathVariable String id, @RequestBody Long minutes) {
-//        try {
-//            Tache tache = tacheService.ajouterTempsPassé(id, minutes);
-//            return ResponseEntity.ok(tache);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    // F12: Ajout de commentaires
-//    @PostMapping("/{id}/commentaires")
-//    public ResponseEntity<Tache> ajouterCommentaire(@PathVariable String id, @RequestBody Commentaire commentaire) {
-//        try {
-//            Tache tache = tacheService.ajouterCommentaire(id, commentaire);
-//            return ResponseEntity.ok(tache);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    // F12: Ajout de pièces jointes
-//    @PostMapping("/{id}/pieces-jointes")
-//    public ResponseEntity<Tache> ajouterPieceJointe(@PathVariable String id, @RequestBody PieceJointe pieceJointe) {
-//        try {
-//            Tache tache = tacheService.ajouterPieceJointe(id, pieceJointe);
-//            return ResponseEntity.ok(tache);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    // F14 & F15: Tableau de bord et statistiques
-//    @GetMapping("/stats/projet/{projetId}")
+    @GetMapping("/projet/{projetId}")
+    public ResponseEntity<List<TacheDTO>> getTachesByProjet(@PathVariable String projetId) {
+        List<TacheDTO> taches = tacheService.getTachesByProjet(projetId);
+        return ResponseEntity.ok(taches.stream()
+                .map(tacheMapper::toDTO)
+                .collect(Collectors.toList()));
+    }
+
+
+    // F06: Associer une tâche à une équipe
+    @PutMapping("/{id}/equipe/{equipeId}")
+    public ResponseEntity<TacheDTO> associerEquipe(@PathVariable String id, @PathVariable String equipeId) {
+        return ResponseEntity.ok(tacheMapper.toDTO(tacheService.associerEquipe(id, equipeId)));
+    }
+
+
+    // F07: Attribuer une tâche à un membre
+    @PutMapping("/{id}/assignee/{membreId}")
+    public ResponseEntity<TacheDTO> assignerTache(@PathVariable String id, @PathVariable String membreId) {
+        return ResponseEntity.ok(tacheMapper.toDTO(tacheService.assignerTache(id, membreId)));
+    }
+
+    // F08: Définir un statut de tâche
+    @PutMapping("/{id}/status")
+    public ResponseEntity<TacheDTO> updateStatus(@PathVariable String id, @RequestBody Status status) {
+        return ResponseEntity.ok(tacheMapper.toDTO(tacheService.updateStatus(id, status)));
+    }
+
+    // F09: Définir des niveaux de priorité
+    @PutMapping("/{id}/priorite")
+    public ResponseEntity<TacheDTO> updatePriorite(@PathVariable String id, @RequestBody Priorite priorite) {
+        return ResponseEntity.ok(tacheMapper.toDTO(tacheService.updatePriorite(id, priorite)));
+    }
+
+    // F10: Suivi du temps passé
+    @PutMapping("/{id}/temps")
+    public ResponseEntity<TacheDTO> ajouterTempsPassé(@PathVariable String id, @RequestBody Long minutes) {
+        return ResponseEntity.ok(tacheMapper.toDTO(tacheService.ajouterTempsPassé(id, minutes)));
+    }
+
+    // F11: Ajout de commentaires
+    @PostMapping("/{id}/commentaires")
+    public ResponseEntity<TacheDTO> ajouterCommentaire(@PathVariable String id, @RequestBody Commentaire commentaire) {
+        return ResponseEntity.ok(tacheMapper.toDTO(tacheService.ajouterCommentaire(id, commentaire)));
+}
+
+    // F12: Recherche avancée et filtrage
+    @GetMapping("/recherche")
+    public ResponseEntity<List<TacheDTO>> rechercherTaches(
+            @RequestParam(required = false) String projetId,
+            @RequestParam(required = false) Status status,
+            @RequestParam(required = false) Priorite priorite,
+            @RequestParam(required = false) String assigneeId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date deadlineBefore) {
+
+        List<Tache> resultats = tacheService.rechercherTaches(
+                projetId,
+                status,
+                priorite,
+                assigneeId,
+                deadlineBefore
+        );
+
+        List<TacheDTO> dtos = resultats.stream()
+                .map(tacheMapper::toDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
+    }
+
+    //    @GetMapping("/stats/projet/{projetId}")
 //    public ResponseEntity<StatistiqueProjet> getStatistiquesProjet(@PathVariable String projetId) {
 //        return ResponseEntity.ok(tacheService.getStatistiquesProjet(projetId));
-//    }
+//    }  // F14 & F15: Tableau de bord et statistiques
+//
 //
 //    @GetMapping("/stats/membres/{projetId}")
 //    public ResponseEntity<Map<String, StatistiqueMembre>> getStatistiquesMembres(@PathVariable String projetId) {
 //        return ResponseEntity.ok(tacheService.getStatistiquesMembres(projetId));
 //    }
-//
-//    // F16: Gestion des dépendances
-//    @GetMapping("/{id}/peut-demarrer")
-//    public ResponseEntity<Boolean> peutDemarrerTache(@PathVariable String id) {
-//        return ResponseEntity.ok(tacheService.peutDemarrerTache(id));
-//    }
-//
-//    // F17: Recherche avancée et filtrage
-//    @GetMapping("/recherche")
-//    public ResponseEntity<List<Tache>> rechercherTaches(
-//            @RequestParam(required = false) String projetId,
-//            @RequestParam(required = false) Status status,
-//            @RequestParam(required = false) Priorite priorite,
-//            @RequestParam(required = false) String assigneeId,
-//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date deadlineBefore) {
-//
-//        return ResponseEntity.ok(tacheService.rechercherTaches(
-//                projetId, status, priorite, assigneeId, deadlineBefore));
-//    }
+
 }

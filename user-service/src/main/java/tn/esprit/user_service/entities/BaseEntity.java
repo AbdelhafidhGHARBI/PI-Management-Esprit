@@ -5,11 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.*;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @ToString
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Serializable {
 
     @Id
     @Setter(AccessLevel.PROTECTED)

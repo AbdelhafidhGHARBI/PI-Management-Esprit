@@ -24,22 +24,35 @@ public class JwtService {
     @Value("${jwt.access-expiration}")
     private long accessExpirationMs;
 
+    @Value("${jwt.refresh-expiration}")
+    private long refreshExpirationMs;
+
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(User user) {
+    // Generate access token
+    public String generateAccessToken(User user) {
+        return buildToken(user, accessExpirationMs);
+    }
+
+    // Generate refresh token
+    public String generateRefreshToken(User user) {
+        return buildToken(user, refreshExpirationMs);
+    }
+
+    private String buildToken(User user, long expiration) {
         return Jwts.builder()
                 .setSubject(user.getId())
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole().toString())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + accessExpirationMs))
+                .claim("tokenVersion", user.getTokenVersion()) // Critical for invalidation
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
     public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -59,9 +72,12 @@ public class JwtService {
 
     public boolean isTokenValid(String token, User user) {
         final String userId = extractUserId(token);
-        return userId.equals(user.getId()) && !isTokenExpired(token);
-    }
+        final Integer tokenVersion = extractClaim(token, claims -> claims.get("tokenVersion", Integer.class));
 
+        return userId.equals(user.getId())
+                && !isTokenExpired(token)
+                && tokenVersion.equals(user.getTokenVersion());
+    }
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
@@ -69,4 +85,6 @@ public class JwtService {
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
+
+
 }

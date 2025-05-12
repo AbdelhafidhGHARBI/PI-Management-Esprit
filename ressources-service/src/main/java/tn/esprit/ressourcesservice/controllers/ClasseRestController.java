@@ -10,7 +10,7 @@ import tn.esprit.ressourcesservice.services.IClasseService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/classe")
+@RequestMapping("ressources/classe")
 @RequiredArgsConstructor
 public class ClasseRestController {
 

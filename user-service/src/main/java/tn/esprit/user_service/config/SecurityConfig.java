@@ -43,7 +43,12 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/auth/**", "/auth/login").permitAll()
+                        .requestMatchers("/api/users/auth/**",
+                                "/api/users/auth/**",
+                                "/auth/login",
+                                "/api/users/profile_images/**" ,
+                                "/profile_images/**"
+                                ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(gatewayAuthFilter, AuthorizationFilter.class)
@@ -53,24 +58,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Keep CORS if your service receives direct browser requests
-//    @Bean
-//    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowedOrigins(List.of(
-//                "http://localhost:4200", // Frontend
-//                "http://localhost:8080"  // API Gateway
-//        ));
-//        config.setAllowedMethods(List.of("*"));
-//        config.setAllowedHeaders(List.of("*"));
-//        config.setExposedHeaders(List.of("Authorization"));
-//        config.setAllowCredentials(true);
-//        config.setMaxAge(3600L);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", config);
-//        return source;
-//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

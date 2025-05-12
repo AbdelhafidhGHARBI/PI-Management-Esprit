@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.securityshared.auth.GatewayAuthentication;
 import tn.esprit.user_service.dto.AuthResponse;
 import tn.esprit.user_service.dto.LoginRequest;
 import tn.esprit.user_service.dto.UserCreateDto;
@@ -27,10 +29,10 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("create")
-    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public UserResponseDto createUser(@Valid @RequestBody UserCreateDto userCreateDto) {
-        return userService.createUser(userCreateDto);
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserCreateDto userCreateDto) {
+        UserResponseDto response = userService.createUser(userCreateDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 
@@ -40,6 +42,7 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest
     ) {
+        // extract device information
         DeviceInfo device = deviceService.extractDeviceInfo(httpRequest);
         return ResponseEntity.ok(authService.authenticate(request, device));
     }
